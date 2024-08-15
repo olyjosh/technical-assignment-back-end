@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { VenueRepository } from './venue/venue.repository';
-import * as appValidator from './app.validator'
+import * as appValidator from './app.validator';
 
 // ! Left here for ease
 export interface Venue {
