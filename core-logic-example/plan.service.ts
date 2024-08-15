@@ -68,7 +68,7 @@ export default class PlanService {
             plants: plants
         }, user, relations);
 
-        return Created(`Cultivation Plan ${result.name} created.`, result);
+        return Created(`Plan ${result.name} created.`, result);
     }
 
     public async Destroy(id: string): Promise<CompResponse<null>> {
@@ -77,7 +77,7 @@ export default class PlanService {
         const plan = await this.repository.FindByIdOrFail(id, ['batches']);
         this.validator.ValidateData.DestroyRequest(plan);
         await this.repository.Delete(id);
-        return NoContent('Cultivation Plan deleted.');
+        return NoContent('Plan deleted.');
     }
 
     public async DestroyGrowthStage(id: string, relations: string[]): Promise<CompResponse<Plan>> {
@@ -133,7 +133,7 @@ export default class PlanService {
 
         result = await this.repository.UpdateById(id, result, relations);
 
-        return Created(`Cultivation Plan ${result.name} created.`, result);
+        return Created(`Plan ${result.name} created.`, result);
     }
 
     public async Index(siteId: string, relations: string[], skip?: number | undefined, take?: number | undefined): Promise<CompResponse<PaginatedResult<IPlan>>> {
@@ -149,13 +149,13 @@ export default class PlanService {
             p.batchCount = batchCounts[p.id!];
         });
 
-        return OkOrNoContent(`Found ${result.total} Cultivation Plan${result.total != 1 ? 's' : ''}.`, 'No Cultivation Plan was found.', result);
+        return OkOrNoContent(`Found ${result.total} Plan${result.total != 1 ? 's' : ''}.`, 'No Plan was found.', result);
     }
 
     public async Show(id: string, relations: string[]): Promise<CompResponse<Plan>> {
         const entity = await this.repository.FindByIdOrFail(id, relations);
 
-        return Ok('Cultivation Plan Found.', entity);
+        return Ok('Plan Found.', entity);
     }
 
     public async Update(id: string, updateRequest: IUpdatePlanRequest, newPhotos: any[], user: IUser, relations: string[]): Promise<CompResponse<IPlan>> {
@@ -200,6 +200,6 @@ export default class PlanService {
         const batchCounts = await this.repository.GetLiveBatchesPrePlanCount(plan.siteId);
         result.batchCount = batchCounts[plan.id];
 
-        return Ok(`Cultivation Plan ${result.name} updated.`, result);
+        return Ok(`Plan ${result.name} updated.`, result);
     }
 }
