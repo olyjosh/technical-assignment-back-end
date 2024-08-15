@@ -1,0 +1,47 @@
+networks:
+  rnv-test-network:
+    name: rnv-test-network
+
+volumes:
+  rnv_test_db_data:
+
+services:
+
+  nest:
+    container_name: rnv_test_nestjs
+    build:
+      context: ./nestjs
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+    entrypoint: ["npm", "run", "start:dev"]
+    volumes:
+      - ./nestjs:/nestjs
+      # Ensure the node_modules built in the image aren't overwritten
+      # by the host's node_modules
+      - /nestjs/node_modules
+    ports:
+      - "4500:4500"
+    networks:
+      - rnv-test-network
+    restart: always
+
+  db:
+    container_name: rnv_test_db
+    build:
+      context: ./mysql
+      dockerfile: Dockerfile
+    volumes:
+      - rnv_test_db_data:/var/lib/mysql
+      - ./mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+    restart: always
+    ports:
+      - "3506:3306"
+    networks:
+      - rnv-test-network
+    environment:
+      MYSQL_ROOT_PASSWORD: rnv_root_pass
+      MYSQL_DATABASE: rnv_test_db
+      MYSQL_USER: rnv_user
+      MYSQL_PASSWORD: rnv_pass
+      TZ: UTC

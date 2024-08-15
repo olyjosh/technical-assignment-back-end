@@ -1,0 +1,3 @@
+GRANT ALL ON *.* TO 'rnv_user'@'%' WITH GRANT OPTION;
+
+FLUSH PRIVILEGES;
