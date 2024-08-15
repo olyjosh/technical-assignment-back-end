@@ -8,7 +8,7 @@ import {
     BadRequest, Created, NoContent, Ok, OkOrNoContent, PaginatedResult, S3Provider
 } from '@company-dep/saas-backend-common';
 import {
-    ArgusResponse,
+    CompResponse,
     ICreatePlanRequest, IPlan, IDailyTarget, IDuplicatePlanRequest,
     IGrowthStage, IUpdatePlanRequest, IUser, IUserTaskData
 } from '@company-dep/saas-models-common';
@@ -51,7 +51,7 @@ export default class PlanService {
         }
     }
 
-    public async Create(createRequest: ICreatePlanRequest, user: IUser, relations: string[]): Promise<ArgusResponse<Plan>> {
+    public async Create(createRequest: ICreatePlanRequest, user: IUser, relations: string[]): Promise<CompResponse<Plan>> {
         const plants = await this.plantRepository.FindByIdsOrFail(createRequest.plantIds!);
         const batchAttributeIds = _.compact([
             createRequest?.targets?.flatMap(t => t?.batchAttributeId),
@@ -71,7 +71,7 @@ export default class PlanService {
         return Created(`Cultivation Plan ${result.name} created.`, result);
     }
 
-    public async Destroy(id: string): Promise<ArgusResponse<null>> {
+    public async Destroy(id: string): Promise<CompResponse<null>> {
         // Nested relations will be fetched by the repository delete method. We just need the batch for
         // the validator, otherwise we wouldn't even bother fetching here.
         const plan = await this.repository.FindByIdOrFail(id, ['batches']);
@@ -80,14 +80,14 @@ export default class PlanService {
         return NoContent('Cultivation Plan deleted.');
     }
 
-    public async DestroyGrowthStage(id: string, relations: string[]): Promise<ArgusResponse<Plan>> {
+    public async DestroyGrowthStage(id: string, relations: string[]): Promise<CompResponse<Plan>> {
         const growthStage = await this.growthStageRepository.FindByIdOrFail(id);
         await this.growthStageRepository.Delete(id);
         const plan = await this.repository.FindByIdOrFail(growthStage.planId, relations);
         return NoContent('Growth Stage deleted.', plan);
     }
 
-    public async Duplicate(id: string, duplicateRequest: IDuplicatePlanRequest, user: IUser, relations: string[]): Promise<ArgusResponse<Plan>> {
+    public async Duplicate(id: string, duplicateRequest: IDuplicatePlanRequest, user: IUser, relations: string[]): Promise<CompResponse<Plan>> {
         const originalPlan = await this.repository.FindByIdOrFail(id, ['plants', 'growthStages', 'growthStages.dailyTargets', 'growthStages.plannedTasks', 'growthStages.stageData', 'targets']);
         const plants = await this.plantRepository.FindByIdsOrFail(duplicateRequest.plantIds!);
 
@@ -136,7 +136,7 @@ export default class PlanService {
         return Created(`Cultivation Plan ${result.name} created.`, result);
     }
 
-    public async Index(siteId: string, relations: string[], skip?: number | undefined, take?: number | undefined): Promise<ArgusResponse<PaginatedResult<IPlan>>> {
+    public async Index(siteId: string, relations: string[], skip?: number | undefined, take?: number | undefined): Promise<CompResponse<PaginatedResult<IPlan>>> {
         const result = await this.repository.FindPaginated({
             where: {siteId: siteId},
             relations: relations,
@@ -152,13 +152,13 @@ export default class PlanService {
         return OkOrNoContent(`Found ${result.total} Cultivation Plan${result.total != 1 ? 's' : ''}.`, 'No Cultivation Plan was found.', result);
     }
 
-    public async Show(id: string, relations: string[]): Promise<ArgusResponse<Plan>> {
+    public async Show(id: string, relations: string[]): Promise<CompResponse<Plan>> {
         const entity = await this.repository.FindByIdOrFail(id, relations);
 
         return Ok('Cultivation Plan Found.', entity);
     }
 
-    public async Update(id: string, updateRequest: IUpdatePlanRequest, newPhotos: any[], user: IUser, relations: string[]): Promise<ArgusResponse<IPlan>> {
+    public async Update(id: string, updateRequest: IUpdatePlanRequest, newPhotos: any[], user: IUser, relations: string[]): Promise<CompResponse<IPlan>> {
         const plan = await this.repository.FindByIdOrFail(id);
         const plants = await this.plantRepository.FindByIdsOrFail(updateRequest.plantIds!);
         const batchAttributeIds = _.compact([

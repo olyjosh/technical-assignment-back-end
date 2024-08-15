@@ -8,7 +8,7 @@ import {
     GET_SITE_ID_FROM_ENTITY, GET_SITE_ID_FROM_REQUEST, PaginatedResult
 } from '@company-dep/saas-backend-common';
 import {
-    ArgusResponse,
+    CompResponse,
     FocusRoles, ICreatePlanRequest, IPlan, IDuplicatePlanRequest,
     IUpdatePlanRequest
 } from '@company-dep/saas-models-common';
@@ -30,45 +30,45 @@ export class PlanController extends Controller {
 
     @Security("jwt", [GET_SITE_ID_FROM_REQUEST, FocusRoles.CULTIVATION_PLAN_CREATE])
     @Post('/')
-    public async Create(@Body() createRequest: ICreatePlanRequest, @Request() request: ExRequest, @Query() relations: string[] = []): Promise<ArgusResponse<Plan>> {
+    public async Create(@Body() createRequest: ICreatePlanRequest, @Request() request: ExRequest, @Query() relations: string[] = []): Promise<CompResponse<Plan>> {
         this.validator.ValidateSchema.CreateRequest(createRequest);
         return this.service.Create(createRequest, request.user, relations);
     }
 
     @Security("jwt", [GET_SITE_ID_FROM_ENTITY, "Plan", FocusRoles.CULTIVATION_PLAN_CREATE])
     @Post('/duplicate-plan/{id}')
-    public async DuplicatePlan(@Path() id: string, @Body() duplicateRequest: IDuplicatePlanRequest, @Request() request: ExRequest, @Query() relations: string[] = []): Promise<ArgusResponse<Plan>> {
+    public async DuplicatePlan(@Path() id: string, @Body() duplicateRequest: IDuplicatePlanRequest, @Request() request: ExRequest, @Query() relations: string[] = []): Promise<CompResponse<Plan>> {
         this.validator.ValidateSchema.DuplicateRequest(duplicateRequest);
         return this.service.Duplicate(id, duplicateRequest, request.user, relations);
     }
 
     @Security("jwt", [GET_SITE_ID_FROM_ENTITY, "Plan", FocusRoles.CULTIVATION_PLAN_DELETE])
     @Delete('/{id}')
-    public async Destroy(@Path() id: string): Promise<ArgusResponse> {
+    public async Destroy(@Path() id: string): Promise<CompResponse> {
         return this.service.Destroy(id);
     }
 
     @Security("jwt", [GET_SITE_ID_FROM_ENTITY, "GrowthStage:plan", FocusRoles.CULTIVATION_PLAN_DELETE])
     @Delete('/growth-stage/{id}')
-    public async DestroyGrowthStage(@Path() id: string, @Query() relations: string[] = []): Promise<ArgusResponse<Plan>> {
+    public async DestroyGrowthStage(@Path() id: string, @Query() relations: string[] = []): Promise<CompResponse<Plan>> {
         return this.service.DestroyGrowthStage(id, relations);
     }
 
     @Security("jwt", [GET_SITE_ID_FROM_REQUEST, FocusRoles.VIEW_ANALYZE, FocusRoles.VIEW_MONITOR])
     @Get('/site/{siteId}')
-    public async Index(@Path() siteId: string, @Query() skip?: number, @Query() take?: number, @Query() relations: string[] = []): Promise<ArgusResponse<PaginatedResult<IPlan>>> {
+    public async Index(@Path() siteId: string, @Query() skip?: number, @Query() take?: number, @Query() relations: string[] = []): Promise<CompResponse<PaginatedResult<IPlan>>> {
         return this.service.Index(siteId, relations, skip, take);
     }
 
     @Security("jwt", [GET_SITE_ID_FROM_ENTITY, "Plan", FocusRoles.VIEW_ANALYZE, FocusRoles.VIEW_MONITOR])
     @Get('/{id}')
-    public async Show(@Path() id: string, @Query() relations: string[] = []): Promise<ArgusResponse<Plan>> {
+    public async Show(@Path() id: string, @Query() relations: string[] = []): Promise<CompResponse<Plan>> {
         return this.service.Show(id, relations);
     }
 
     @Security("jwt", [GET_SITE_ID_FROM_ENTITY, "Plan", FocusRoles.CULTIVATION_PLAN_UPDATE])
     @Put('/{id}')
-    public async Update(@Path() id: string, @Body() updateRequest: IUpdatePlanRequest, @Request() request: ExRequest, @Query() relations: string[] = []): Promise<ArgusResponse<IPlan>> {
+    public async Update(@Path() id: string, @Body() updateRequest: IUpdatePlanRequest, @Request() request: ExRequest, @Query() relations: string[] = []): Promise<CompResponse<IPlan>> {
         const newPhotos: any = request.files;
 
         this.validator.ValidateSchema.UpdateRequest(updateRequest);
